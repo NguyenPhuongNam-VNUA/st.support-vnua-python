@@ -41,16 +41,51 @@ def build_context_with_scores(results):
 
 def similarity_search():
     results = vectorstore.similarity_search_with_relevance_scores(
-        query="Yêu mình đi mà",
+        query="Khi vào nhập học thì cần giấy tờ gì?",
         k=3,
-        filter={"has_answer": True}
     )
     for doc, score in results:
         print(score, doc.page_content)
 
+def check_duplicate():
+    questions = [
+        {"question": "Em muốn xin giấy xác nhận là sinh viên thì xin ở đâu ạ?"},
+        {"question": "Em muốn làm lại thẻ sinh viên thì làm ở đâu ạ?"},
+        {"question": "Em muốn xin chuyển ngành thì cần những giấy tờ gì?"},
+    ]
+
+    results = []
+
+    for q in questions:
+        question_text = q.get("question", "")
+
+        data = vectorstore.similarity_search_with_relevance_scores(
+            query=question_text,
+            k=1,
+        )
+
+        if data:
+            doc, score = data[0]
+            print("Metadata:", doc.metadata)
+            results.append({
+                "id": doc.id,
+                "question_dup": doc.page_content,
+                "score": round(score * 100, 2),
+                "question": question_text
+            })
+        else:
+            results.append({
+                "id": None,
+                "question_dup": None,
+                "score": 0
+            })
+
+    print(results)
+
+
 # render_data()
 # retrieve_data()
 similarity_search()
-
+# check_duplicate()
 
 

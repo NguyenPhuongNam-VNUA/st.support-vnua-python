@@ -3,7 +3,8 @@ from flask_cors import CORS
 
 from embed_utils import (
     upsert_from_dict, delete_from_dict,
-    is_duplicate_question, maybe_save_question_to_db
+    is_duplicate_question, maybe_save_question_to_db,
+    run_embedding_from_file
 )
 from collection import vectorstore
 from rag_utils import generate_rag_answer
@@ -27,6 +28,30 @@ def check_duplicate():
         }), 409
     return jsonify({"is_duplicate": False, "message": "Câu hỏi mới."}), 200
 
+@app.route("/api/check-excel", methods=["POST"])
+def check_excel():
+    data = request.json
+    questions = data.get("questions", [])
+
+    results = []
+    for question in questions:
+        question_text = question.get("question", "")
+        answer_text = question.get("answer", "")
+        has_answer = question.get("has_answer", False)
+        is_dup, doc, doc_id, score = is_duplicate_question(question_text)
+
+        results.append({
+            "question": question_text,
+            "answer": answer_text,
+            "has_answer": has_answer,
+            "is_duplicate": is_dup,
+            "existing_doc": doc,
+            "existing_id": doc_id,
+            "score": round(score * 100, 2)
+        })
+    print("[✓] Thực hiện kiểm tra trùng lặp xong.")
+    return jsonify({"results": results}), 200
+
 @app.route("/api/embed", methods=["POST"])
 def embed_question():
     data = request.json
@@ -36,7 +61,28 @@ def embed_question():
         answer=str(data.get("answer")),
         has_answer=(data.get("has_answer"))
     )
+
+    print("[✓] Thực hiện embedding xong.")
     return jsonify({"message": "Embedding thành công"}), 200
+
+@app.route("/api/embed-batch", methods=["POST"])
+def embed_batch():
+    # print("→ Nhận yêu cầu embed-batch")
+    data = request.json
+    questions = data.get("questions", [])
+    # print(questions)
+
+    for question in questions:
+        # print(question.get("id"), question.get("question"))
+        upsert_from_dict(
+            id=str(question.get("id")),
+            question=str(question.get("question")),
+            answer=str(question.get("answer")),
+            has_answer=(question.get("has_answer", True))
+        )
+
+    print("[✓] Thực hiện embedding batch xong.")
+    return jsonify({"message": "Embedding batch thành công", "data": questions}), 200
 
 @app.route("/api/delete-embed", methods=["POST"])
 def delete_embed():
@@ -74,6 +120,18 @@ def build_context_with_scores(results):
             """
         )
     return "\n".join(context_parts) if context_parts else "Không tìm thấy dữ liệu phù hợp."
+
+@app.route("/api/embed-doc", methods=["POST"])
+def embed_doc():
+    data = request.json
+    file_path = data.get("file_path")
+
+    if not file_path:
+        return jsonify({"error": "Thiếu đường dẫn file"}), 400
+
+    # gọi hàm xử lý chunking + embedding tại đây
+    run_embedding_from_file(file_path)  # ví dụ
+    return jsonify({"message": "Embedding thành công"}), 200
 
 @app.route("/api/ask", methods=["POST"])
 def ask():
