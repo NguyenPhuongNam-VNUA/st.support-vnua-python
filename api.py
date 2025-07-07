@@ -1,3 +1,8 @@
+try:
+    import sqlite_patch
+except ImportError:
+    print("⚠️  Bỏ qua patch SQLite vì thiếu pysqlite3 (chạy local)")
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -8,7 +13,6 @@ from embed_utils import (
 )
 from collection import vectorstore
 from rag_utils import generate_rag_answer
-from langchain.chains import RetrievalQA
 
 app = Flask(__name__)
 CORS(app)

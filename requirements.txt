@@ -1,0 +1,14 @@
+flask
+flask-cors
+langchain
+langchain-chroma
+langchain-huggingface
+langchain-community
+google-generativeai
+sentence-transformers
+chromadb
+pymupdf
+requests
+pypdf
+python-docx
+google-genai
