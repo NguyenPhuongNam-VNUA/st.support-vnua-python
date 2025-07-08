@@ -1,7 +1,10 @@
+import os
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
-client = genai.Client(api_key="AIzaSyDIAOZIEKlPn4l3EQHGFd-qHJynO4pX1eQ")
+load_dotenv()
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 def generate_rag_answer(question, context):
     prompt = f"""
