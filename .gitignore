@@ -13,4 +13,4 @@ venv/
 .idea/
 
 # SQLite3 file (nếu dùng production DB)
-data/chroma.sqlite3
+data/
