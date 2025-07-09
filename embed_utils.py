@@ -49,7 +49,8 @@ def is_duplicate_question(question: str, threshold: float = 0.85):
 def maybe_save_question_to_db(question: str, answer: str):
     if "chưa có thông tin" in answer:
         try:
-            res = requests.post("http://127.0.0.1:8000/api/questions", json={
+            laravel_api =os.getenv("LARAVEL_API_BASE_URL")
+            res = requests.post(f"{laravel_api}/questions", json={
                 "question": question,
                 "answer": None,
                 "has_answer": False
