@@ -15,7 +15,7 @@ from collection import vectorstore
 from rag_utils import generate_rag_answer
 import time
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(app, origins=["https://st-dse.vnua.edu.vn:6896"], supports_credentials=True)
 
 @app.route("/api/check-duplicate", methods=["POST"])
 def check_duplicate():
