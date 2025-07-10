@@ -1,10 +1,17 @@
 import os
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
+import concurrent.futures
+from google import generativeai as genai
+from google.generativeai import GenerativeModel
 
+# Load biến môi trường và cấu hình API key
 load_dotenv()
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+
+model = GenerativeModel("gemini-2.0-flash")
+
+def call_gemini(prompt):
+    return model.generate_content(prompt).text.strip()
 
 def generate_rag_answer(question, context):
     prompt = f"""
@@ -23,13 +30,11 @@ def generate_rag_answer(question, context):
     """
 
     try:
-        # Generate content using the Gemini model
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            config=types.GenerateContentConfig(temperature=0.4),
-            contents=[prompt],
-        )
-        return response.text.strip()
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(call_gemini, prompt)
+            return future.result(timeout=10)
+    except concurrent.futures.TimeoutError:
+        return "Xin lỗi, hệ thống đang phản hồi chậm. Vui lòng thử lại sau."
     except Exception as e:
-        print(f"[✗] Lỗi khi gọi API Gemini: {e}")
-        return "Xin lỗi, hiện tại tôi không thể trả lời câu hỏi này do lỗi hệ thống."
+        print(f"[✗] Lỗi khi gọi Gemini: {e}")
+        return "Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại sau."
