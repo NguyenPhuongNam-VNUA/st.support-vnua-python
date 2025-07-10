@@ -22,9 +22,14 @@ def generate_rag_answer(question, context):
     CÂU HỎI: {question}
     """
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        config=types.GenerateContentConfig(temperature=0.4),
-        contents=[prompt],
-    )
-    return response.text.strip()
+    try:
+        # Generate content using the Gemini model
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            config=types.GenerateContentConfig(temperature=0.4),
+            contents=[prompt],
+        )
+        return response.text.strip()
+    except Exception as e:
+        print(f"[✗] Lỗi khi gọi API Gemini: {e}")
+        return "Xin lỗi, hiện tại tôi không thể trả lời câu hỏi này do lỗi hệ thống."

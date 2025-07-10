@@ -13,7 +13,7 @@ from embed_utils import (
 )
 from collection import vectorstore
 from rag_utils import generate_rag_answer
-
+import time
 app = Flask(__name__)
 CORS(app)
 
@@ -139,20 +139,29 @@ def embed_doc():
 
 @app.route("/api/ask", methods=["POST"])
 def ask():
+    start = time.time()
     data = request.json
     question = data.get("question")
 
+    t1 = time.time()
     results = vectorstore.similarity_search_with_relevance_scores(
         query=question,
         k=3,
-        # filter={"has_answer": True}
     )
+    print(f"[⏱️] similarity_search: {time.time() - t1:.2f}s")
 
+    t2 = time.time()
     context = build_context_with_scores(results)
     answer = generate_rag_answer(question, context)
+    print(f"[⏱️] Gemini answer: {time.time() - t2:.2f}s")
+
+    t3 = time.time()
     maybe_save_question_to_db(question, answer)
+    print(f"[⏱️] Save DB: {time.time() - t3:.2f}s")
+
+    print(f"[✅] Tổng thời gian xử lý: {time.time() - start:.2f}s")
 
     return jsonify({"question": question, "context": context, "answer": answer})
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(port=5000)
