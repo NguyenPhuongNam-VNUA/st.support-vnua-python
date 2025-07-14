@@ -4,6 +4,10 @@ import traceback
 import os
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyMuPDFLoader
+from dotenv import load_dotenv
+
+# Load biến môi trường
+load_dotenv()
 
 def upsert_from_dict(id: str, question: str, answer: str, has_answer: bool = True):
     try:
@@ -49,18 +53,30 @@ def is_duplicate_question(question: str, threshold: float = 0.85):
 def maybe_save_question_to_db(question: str, answer: str):
     if "chưa có thông tin" in answer:
         try:
-            laravel_api =os.getenv("LARAVEL_API_BASE_URL")
-            res = requests.post(f"{laravel_api}/questions", json={
-                "question": question,
-                "answer": None,
-                "has_answer": False
-            })
-            if res.status_code == 200:
+            laravel_api = os.getenv("LARAVEL_API_BASE_URL")
+            secret = os.getenv("PUBLIC_QUESTION_SECRET")
+
+            res = requests.post(
+                f"{laravel_api}/public/questions",
+                json={
+                    "question": question,
+                    "answer": None,
+                    "has_answer": False
+                },
+                headers={"x-api-secret": secret}
+            )
+
+            print(f"[✓] Gửi yêu cầu lưu câu hỏi: {question}")
+            print(f"[→] Status Code: {res.status_code}")
+
+            if res.status_code == 200 or res.status_code == 201:
                 print(f"[✓] Đã lưu câu hỏi chưa có thông tin: {question}")
             else:
-                print(f"[✗] Câu hỏi đã tồn tại.")
+                print(f"[✗] Laravel trả về lỗi: {res.status_code}")
+
         except Exception as e:
-            print(f"[✗] Lỗi khi lưu câu hỏi: {e}")
+            print(f"[✗] Lỗi khi gửi request tới Laravel: {e}")
+
 
 def run_embedding_from_file(file_path: str):
     try:
