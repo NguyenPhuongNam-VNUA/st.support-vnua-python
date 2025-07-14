@@ -15,7 +15,14 @@ from collection import vectorstore
 from rag_utils import generate_rag_answer
 import time
 app = Flask(__name__)
-CORS(app, origins=["https://st-dse.vnua.edu.vn:6896"], supports_credentials=True)
+CORS(
+    app,
+    origins=[
+        "https://st-dse.vnua.edu.vn:6896",
+        "http://127.0.0.1:5173",
+        "http://localhost:5173"],
+    supports_credentials=True
+)
 
 @app.route("/api/check-duplicate", methods=["POST"])
 def check_duplicate():
@@ -116,8 +123,7 @@ def build_context_with_scores(results):
         match_percent = score * 100
         context_parts.append(
             f"""---
-            KẾT QUẢ #{i}
-            Mức độ tương đồng với câu hỏi: {match_percent:.2f}%
+            KẾT QUẢ #{i} - Mức độ tương đồng với câu hỏi: {match_percent:.2f}%
             
             • Hỏi: {doc.page_content}
             • Trả lời: {doc.metadata.get('answer', 'Chưa rõ')}
@@ -142,6 +148,7 @@ def ask():
     start = time.time()
     data = request.json
     question = data.get("question")
+    history = data.get("messages", [])
 
     t1 = time.time()
     results = vectorstore.similarity_search_with_relevance_scores(
@@ -152,7 +159,7 @@ def ask():
 
     t2 = time.time()
     context = build_context_with_scores(results)
-    answer = generate_rag_answer(question, context)
+    answer = generate_rag_answer(question, context, history)
     print(f"[⏱️] Gemini answer: {time.time() - t2:.2f}s")
 
     t3 = time.time()
