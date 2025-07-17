@@ -1,13 +1,14 @@
 from collection import vectorstore
 
 def render_data():
-    peek_data = vectorstore._collection.peek()
-    for i, doc in enumerate(peek_data["documents"]):
-        metadata = peek_data["metadatas"][i]
-        print("ID:", peek_data["ids"][i])
-        print("Document:", doc)
-        print("Answer:", metadata.get("answer"))
-        print("—" * 40)
+    peek_data = vectorstore._collection.get()
+    print(peek_data)
+    # for i, doc in enumerate(peek_data["documents"]):
+    #     metadata = peek_data["metadatas"][i]
+    #     print("ID:", peek_data["ids"][i])
+    #     print("Document:", doc)
+    #     print("Answer:", metadata.get("answer"))
+    #     print("—" * 40)
 
 def retrieve_data():
     retriever = vectorstore.as_retriever(
@@ -19,7 +20,6 @@ def retrieve_data():
     for doc in results:
         print("Document:", doc.page_content)
         print("—" * 40)
-
 
 def build_context_with_scores(results):
     """
@@ -82,10 +82,28 @@ def check_duplicate():
 
     print(results)
 
+def delete_embed_file(file_path: str):
+    # Lấy toàn bộ embedding (metadatas + ids)
+    results = vectorstore._collection.get(include=["metadatas"])
+    ids = results["ids"]
+    metadatas = results["metadatas"]
 
-# render_data()
+    # Lọc các đoạn có metadata["source"] == file_path
+    ids_to_delete = [
+        doc_id for doc_id, metadata in zip(ids, metadatas)
+        if metadata.get("source") == file_path
+    ]
+
+    if ids_to_delete:
+        vectorstore.delete(ids=ids_to_delete)
+        print(f"[✓] Đã xoá {len(ids_to_delete)} đoạn embedding từ file: {file_path}")
+    else:
+        print(f"[!] Không tìm thấy đoạn embedding nào từ file: {file_path}")
+
+render_data()
 # retrieve_data()
-similarity_search()
+# similarity_search()
 # check_duplicate()
+# delete_embed_file("documents/EintJ75UYX9HLOilU9F37Mg4EUQDQkgl372AMzdr.pdf")
 
 
