@@ -204,4 +204,4 @@ def ask():
     return jsonify({"question": question, "context": context, "answer": answer})
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(port=5000)
