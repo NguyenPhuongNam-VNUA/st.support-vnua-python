@@ -38,7 +38,7 @@ def generate_rag_answer(question, context, history):
                 và nếu là câu hỏi liên quan đến chủ đề mà chưa có dữ liệu, hãy trả lời:
                   "Câu hỏi này hiện chưa có thông tin trong hệ thống. Cảm ơn bạn, mình sẽ cập nhật sớm!"
                 """,
-                temperature=0.5,
+                temperature=0.6,
                 presence_penalty=0.3,
                 frequency_penalty=0.3,
             ),
