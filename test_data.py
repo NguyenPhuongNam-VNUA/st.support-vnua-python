@@ -41,11 +41,13 @@ def build_context_with_scores(results):
 
 def similarity_search():
     results = vectorstore.similarity_search_with_relevance_scores(
-        query="Khi vào nhập học thì cần giấy tờ gì?",
-        k=3,
+        query="Xin giấy xác nhận là sinh viên thì xin ở đâu ạ?",
+        # metadata={"has_answer": True},
+        k=10,
     )
     for doc, score in results:
         print(score, doc.page_content)
+        print("==========================")
 
 def check_duplicate():
     questions = [
@@ -100,9 +102,9 @@ def delete_embed_file(file_path: str):
     else:
         print(f"[!] Không tìm thấy đoạn embedding nào từ file: {file_path}")
 
-render_data()
+# render_data()
 # retrieve_data()
-# similarity_search()
+similarity_search()
 # check_duplicate()
 # delete_embed_file("documents/EintJ75UYX9HLOilU9F37Mg4EUQDQkgl372AMzdr.pdf")
 

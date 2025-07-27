@@ -20,7 +20,7 @@ def upsert_from_dict(id: str, question: str, answer: str, has_answer: bool = Tru
             texts=[question],
             ids=[id],
             metadatas=[{
-                "question": question,
+                #chủ để, key words, các câu hỏi liêu quan
                 "answer": answer,
                 "has_answer": has_answer
             }]

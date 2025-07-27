@@ -150,7 +150,7 @@ def build_context_mixed(results):
         if doc.metadata.get("has_answer", False):
             match_percent = score * 100
             faq_parts.append(
-                f"""---\nKẾT QUẢ #{i} - Mức độ tương đồng với câu hỏi: {match_percent:.2f}%\n\n• Hỏi: {doc.page_content}\n• Trả lời: {doc.metadata.get('answer', 'Chưa rõ')}\n"""
+                f"""---\n[Thông tin tham khảo #{i}] \n• Hỏi: {doc.page_content}\n• Trả lời: {doc.metadata.get('answer', 'Chưa rõ')}\n"""
             )
 
         # Nếu là tài liệu từ file PDF
@@ -189,8 +189,10 @@ def ask():
     )
     print(f"[⏱️] similarity_search: {time.time() - t1:.2f}s")
 
+    # print(results)
     t2 = time.time()
     context =build_context_mixed(results)
+    print(context)
     # return jsonify({ "context": context}), 200
     answer = generate_rag_answer(question, context, history)
     print(f"[⏱️] Gemini answer: {time.time() - t2:.2f}s")
