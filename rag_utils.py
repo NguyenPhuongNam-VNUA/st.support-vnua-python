@@ -39,8 +39,8 @@ def generate_rag_answer(question, context, history):
                   "Câu hỏi này hiện chưa có thông tin trong hệ thống. Cảm ơn bạn, mình sẽ cập nhật sớm!"
                 """,
                 temperature=0.6,
-                presence_penalty=0.3,
-                frequency_penalty=0.3,
+                # presence_penalty=0.3,
+                # frequency_penalty=0.3,
             ),
         )
         response = chat.send_message(prompt)
