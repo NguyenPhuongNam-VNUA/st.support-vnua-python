@@ -19,11 +19,18 @@ import time
 app = Flask(__name__)
 CORS(
     app,
-    origins=[
-        "https://st-dse.vnua.edu.vn:6896",
-        "http://127.0.0.1:5173",
-        "http://localhost:5173"],
-    supports_credentials=True
+    resources={
+        r"/api/*": {
+            "origins": [
+                "https://st-dse.vnua.edu.vn:6896",
+                "http://127.0.0.1:5173",
+                "http://localhost:5173"
+            ]
+        }
+    },
+    supports_credentials=True,
+    allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
+    methods=["GET", "POST", "OPTIONS"]
 )
 
 @app.route("/api/check-duplicate", methods=["POST"])
