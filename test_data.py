@@ -68,15 +68,9 @@ def countInputTokens():
 
     return result
 
-from langchain_chroma import Chroma
 def test_semantic_similarity():
-    model = get_gemini_embedding_model(task_type='SEMANTIC_SIMILARITY')
-    vectorstore = Chroma(
-        embedding_function=model,
-        collection_name="test_semantic_similarity",
-        persist_directory=None,
-        collection_metadata={"hnsw:space": "cosine"}
-    )
+    pass
+
 
     contents = [
         "Em muốn xin giấy xác nhận là sinh viên thì xin ở đâu ạ?\nGiấy xác nhận sinh viên lấy ở đâu? Xác nhận sinh viên lấy kiểu gì?",

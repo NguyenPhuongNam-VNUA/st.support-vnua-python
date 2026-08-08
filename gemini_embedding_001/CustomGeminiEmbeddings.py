@@ -1,4 +1,3 @@
-from langchain.embeddings.base import Embeddings
 from typing import List
 import numpy as np
 from numpy.linalg import norm
@@ -11,11 +10,11 @@ from dotenv import load_dotenv
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
-class CustomGeminiEmbeddings(Embeddings):
-    def __init__(self, task_type: str):
-        super().__init__()
+class CustomGeminiEmbeddings:
+    def __init__(self, task_type: str = "RETRIEVAL_DOCUMENT"):
         self.task_type = task_type
         self.model = "gemini-embedding-001"
+
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         embeddings = []
